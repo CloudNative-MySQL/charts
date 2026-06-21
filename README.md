@@ -1,8 +1,8 @@
-# CloudNative MySQL Helm charts
+# CNMSQL - CloudNative for MySQL Helm charts
 
-This repository contains the official Helm chart for [CloudNative MySQL](https://cloudnative-mysql.io), a Kubernetes operator for Percona Server for MySQL.
+This repository contains the official Helm chart for [CNMSQL - CloudNative for MySQL](https://cnmsql.co), a Kubernetes operator for Percona Server for MySQL.
 
-The chart lives under [`charts/cloudnative-mysql`](./charts/cloudnative-mysql). It can install the operator in two ways:
+The chart lives under [`charts/cnmsql`](./charts/cnmsql). It can install the operator in two ways:
 
 - **Cluster-wide** (default): the operator watches every namespace and manages `Cluster` resources anywhere in the cluster.
 - **Namespaced**: the operator watches only the release namespace, which lets multiple independent operators coexist on the same cluster.
@@ -20,17 +20,17 @@ Add this repository or use the chart directly from the local path.
 ### Install cluster-wide
 
 ```bash
-helm install cnmysql ./charts/cloudnative-mysql \
-  --namespace cnmysql-system \
+helm install cnmsql ./charts/cnmsql \
+  --namespace cnmsql-system \
   --create-namespace
 ```
 
-The operator image defaults to `ghcr.io/cloudnative-mysql/cloudnative-mysql:<chart-appVersion>`.
+The operator image defaults to `ghcr.io/cnmsql/cnmsql:<chart-appVersion>`.
 
 ### Install namespaced
 
 ```bash
-helm install cnmysql ./charts/cloudnative-mysql \
+helm install cnmsql ./charts/cnmsql \
   --namespace tenant-a \
   --create-namespace \
   --set rbac.namespaced=true
@@ -43,17 +43,17 @@ In namespaced mode the release is constrained to `tenant-a`. The chart creates a
 To point the chart at a custom image:
 
 ```bash
-helm install cnmysql ./charts/cloudnative-mysql \
-  --namespace cnmysql-system \
+helm install cnmsql ./charts/cnmsql \
+  --namespace cnmsql-system \
   --create-namespace \
-  --set manager.image.repository=ghcr.io/cloudnative-mysql/cloudnative-mysql \
+  --set manager.image.repository=ghcr.io/cnmsql/cnmsql \
   --set manager.image.tag=main
 ```
 
 ## Uninstall
 
 ```bash
-helm uninstall cnmysql -n cnmysql-system
+helm uninstall cnmsql -n cnmsql-system
 ```
 
 CRDs are kept by default (`crd.keep=true`) so uninstalling a release does not remove existing `Cluster` or `Backup` resources.
@@ -63,8 +63,8 @@ CRDs are kept by default (`crd.keep=true`) so uninstalling a release does not re
 The chart is packaged and pushed to GitHub Container Registry on every pushed tag that starts with `v` and on workflow dispatch. Install from OCI:
 
 ```bash
-helm install cnmysql oci://ghcr.io/cloudnative-mysql/charts/cloudnative-mysql \
-  --namespace cnmysql-system \
+helm install cnmsql oci://ghcr.io/cnmsql/charts/cnmsql \
+  --namespace cnmsql-system \
   --create-namespace
 ```
 
@@ -72,7 +72,7 @@ helm install cnmysql oci://ghcr.io/cloudnative-mysql/charts/cloudnative-mysql \
 
 ```
 charts/
-└── cloudnative-mysql/         # the Helm chart
+└── cnmsql/         # the Helm chart
     ├── Chart.yaml
     ├── values.yaml
     ├── README.md
@@ -84,8 +84,8 @@ charts/
 Follow the operator repository conventions. Before committing, run:
 
 ```bash
-helm lint ./charts/cloudnative-mysql
-helm lint ./charts/cloudnative-mysql --set rbac.namespaced=true
+helm lint ./charts/cnmsql
+helm lint ./charts/cnmsql --set rbac.namespaced=true
 ```
 
 Changes to templates should be validated against both installation modes.

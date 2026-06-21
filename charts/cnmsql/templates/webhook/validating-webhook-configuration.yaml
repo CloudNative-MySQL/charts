@@ -1,0 +1,35 @@
+{{- if .Values.webhook.enable }}
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    {{- if .Values.certManager.enable }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "cnmsql.resourceName" (dict "suffix" "serving-cert" "context" $) }}
+    {{- end }}
+  name: {{ include "cnmsql.resourceName" (dict "suffix" "validating-webhook-configuration" "context" $) }}
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ include "cnmsql.resourceName" (dict "suffix" "webhook-service" "context" $) }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-mysql-cnmsql-io-v1alpha1-cluster-status
+  failurePolicy: Fail
+  name: vclusterstatus-v1alpha1.cnmsql.co
+  rules:
+  - apiGroups:
+    - mysql.cnmsql.co
+    apiVersions:
+    - v1alpha1
+    operations:
+    - UPDATE
+    resources:
+    - clusters/status
+  sideEffects: None
+  {{- if .Values.rbac.namespaced }}
+  namespaceSelector:
+    matchLabels:
+      "kubernetes.io/metadata.name": {{ .Release.Namespace | quote }}
+  {{- end }}
+{{- end }}

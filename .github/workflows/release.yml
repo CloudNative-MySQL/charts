@@ -3,7 +3,7 @@ name: Release Helm chart
 on:
   push:
     tags:
-    - cloudnative-mysql-v*
+    - cnmsql-v*
   workflow_dispatch:
 
 
@@ -24,15 +24,15 @@ jobs:
       uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
 
     - name: Lint chart (cluster-wide mode)
-      run: helm lint ./charts/cloudnative-mysql
+      run: helm lint ./charts/cnmsql
 
     - name: Lint chart (namespaced mode)
-      run: helm lint ./charts/cloudnative-mysql --set rbac.namespaced=true
+      run: helm lint ./charts/cnmsql --set rbac.namespaced=true
 
     - name: Template chart in both modes
       run: |
-        helm template cnmysql ./charts/cloudnative-mysql --namespace cnmysql-system > /tmp/cluster-wide.yaml
-        helm template cnmysql ./charts/cloudnative-mysql --namespace cnmysql-system --set rbac.namespaced=true > /tmp/namespaced.yaml
+        helm template cnmsql ./charts/cnmsql --namespace cnmsql-system > /tmp/cluster-wide.yaml
+        helm template cnmsql ./charts/cnmsql --namespace cnmsql-system --set rbac.namespaced=true > /tmp/namespaced.yaml
 
   push:
     runs-on: ubuntu-latest
@@ -53,11 +53,11 @@ jobs:
 
     - name: Package and push chart to OCI
       run: |
-        CHART_DIR="./charts/cloudnative-mysql"
+        CHART_DIR="./charts/cnmsql"
         helm lint "$CHART_DIR"
         helm package "$CHART_DIR" --destination .
 
-        PKG=$(ls cloudnative-mysql-*.tgz | head -n 1)
+        PKG=$(ls cnmsql-*.tgz | head -n 1)
         OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
         echo "Pushing ${PKG} to oci://ghcr.io/${OWNER_LOWER}/charts"
