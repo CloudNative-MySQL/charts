@@ -3,8 +3,8 @@ name: cnmsql
 description: A Helm chart for the CNMSQL - CloudNative for MySQL operator
 type: application
 
-version: 0.2.3
-appVersion: "0.2.3"
+version: 0.3.0
+appVersion: "0.3.0"
 
 keywords:
   - kubernetes
