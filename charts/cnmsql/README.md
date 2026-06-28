@@ -101,8 +101,8 @@ Default resource requests and limits are intentionally low:
 
 | Resource | Request | Limit |
 |---|---|---|
-| CPU | `10m` | `500m` |
-| Memory | `64Mi` | `128Mi` |
+| CPU | `10m` | `1` |
+| Memory | `64Mi` | `1Gi` |
 
 Adjust them through `manager.resources` for production workloads.
 

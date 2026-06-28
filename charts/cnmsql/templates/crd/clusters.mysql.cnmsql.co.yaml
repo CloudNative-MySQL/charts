@@ -1,4 +1,5 @@
 {{- if .Values.crd.enable }}
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -1447,7 +1448,12 @@ spec:
                     type: object
                   resizeInUseVolumes:
                     default: true
-                    description: Resize existing PVCs, defaults to true
+                    description: |-
+                      ResizeInUseVolumes, when true (the default), grows mounted PVCs in place and
+                      relies on the storage backend to expand the filesystem online. Set it to
+                      false when the backend cannot expand a volume in use: the operator then
+                      completes a resize by recycling the instance Pod (serialised
+                      replica-by-replica, primary last) so the volume is detached and remounted.
                     type: boolean
                   size:
                     description: |-
@@ -1605,6 +1611,15 @@ spec:
                 description: |-
                   EnableSuperuserAccess, when true, makes the root user reachable through the
                   generated/provided secret. Defaults to false.
+                type: boolean
+              enableSwitchoverOnDrain:
+                default: true
+                description: |-
+                  EnableSwitchoverOnDrain, when true (default), makes the operator promote a
+                  healthy replica via a planned switchover when the primary Pod is gracefully
+                  terminated (e.g. a node drain or eviction), instead of waiting for the
+                  primary to become unreachable and failing over. Falls back to failover when
+                  no safe candidate exists or the handoff cannot complete in time.
                 type: boolean
               env:
                 description: |-
@@ -3423,7 +3438,12 @@ spec:
                     type: object
                   resizeInUseVolumes:
                     default: true
-                    description: Resize existing PVCs, defaults to true
+                    description: |-
+                      ResizeInUseVolumes, when true (the default), grows mounted PVCs in place and
+                      relies on the storage backend to expand the filesystem online. Set it to
+                      false when the backend cannot expand a volume in use: the operator then
+                      completes a resize by recycling the instance Pod (serialised
+                      replica-by-replica, primary last) so the volume is detached and remounted.
                     type: boolean
                   size:
                     description: |-
@@ -4025,6 +4045,16 @@ spec:
                   derived from the SQL-layer replication error the in-Pod reconciler reports,
                   so a replica that is Running but cannot replicate is surfaced as a
                   degradation rather than being mistaken for one still finishing provisioning.
+                items:
+                  type: string
+                type: array
+              resizingPVC:
+                description: |-
+                  ResizingPVC lists the PVCs whose storage is currently being expanded — the
+                  volume-level resize or the node-side filesystem grow has not yet completed.
+                  For a backend that cannot expand a volume in use (storage.resizeInUseVolumes
+                  false) a name lingers here until the operator recycles the owning Pod and the
+                  fresh mount finishes the resize.
                 items:
                   type: string
                 type: array
